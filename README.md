@@ -10,6 +10,8 @@ The purpose of SamsoniteOS is to round out the offerings of Bazzite, both with s
 - [x] **Virtualization:** Libvirt/QEMU, Cockpit (Machines, Podman, Bridge)
 - [x] **Development:** VS Code (System install), Android Tools, BPF Tools (bpftop, bpftrace), Sysprof
 - [x] **CLI Utilities:** zsh, restic, rclone, ccache, ramalama (Local AI)
+- [ ] **Editor:** Zed (System install)
+- [ ] **Unified Virtualization:** System-level GNOME Boxes + Virt-Manager integration.
 
 **Desktop & Media**
 - [x] **NVIDIA Pascal Support:** Built on `bazzite-gnome-nvidia` for legacy driver support.
