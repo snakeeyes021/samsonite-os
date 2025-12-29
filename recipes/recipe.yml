@@ -3,13 +3,18 @@
 name: samsonite-os
 description: Custom Bazzite GNOME/NVIDIA DX Image
 base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia
-image-version: stable
+image-version: latest
 
 modules:
   - type: files
     files:
       - source: system
         destination: /
+
+  # Install packages via Containerfile to handle dependency conflicts (Surgical DNF)
+  - type: containerfile
+    containerfiles:
+      - containerfiles/dnf-overrides.Containerfile
 
   # Install RPM Packages
   - type: rpm-ostree
@@ -34,7 +39,6 @@ modules:
       - sysprof
       - trace-cmd
       - bpftop
-      - bpftrace
 
       # Admin/Web
       - cockpit-bridge
