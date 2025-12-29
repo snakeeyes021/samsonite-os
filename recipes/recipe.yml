@@ -34,7 +34,6 @@ modules:
       - sysprof
       - trace-cmd
       - bpftop
-      - bpftrace
 
       # Admin/Web
       - cockpit-bridge
