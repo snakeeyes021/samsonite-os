@@ -19,6 +19,7 @@ The purpose of SamsoniteOS is to round out the offerings of Bazzite, both with s
 - [ ] **Audio Production:** A curated collection of music/audio tools.
 - [ ] **Shell Customization:** Starship prompt integration.
 - [ ] **GNOME Tweaks:** Further "vanilla" GNOME configuration.
+- [ ] **More:** Wallpaper, keyboard shortcuts, etc.
 
 ### Installation
 
