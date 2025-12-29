@@ -11,6 +11,11 @@ modules:
       - source: system
         destination: /
 
+  # Align with repos to avoid dependency hell
+  - type: script
+    scripts:
+      - scripts/upgrade-system.sh
+
   # Install RPM Packages
   - type: rpm-ostree
     install:
@@ -34,6 +39,7 @@ modules:
       - sysprof
       - trace-cmd
       - bpftop
+      - bpftrace
 
       # Admin/Web
       - cockpit-bridge
