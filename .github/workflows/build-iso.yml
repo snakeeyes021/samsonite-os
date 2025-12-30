@@ -34,6 +34,15 @@ jobs:
       # 1. CRITICAL: Free up ~20GB of space by removing Android SDKs, DotNet, etc.
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          # Optimizations to make this step faster
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
 
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -50,8 +59,9 @@ jobs:
       - name: Build ISO
         uses: osbuild/bootc-image-builder-action@main
         with:
+          types: anaconda-iso
+          config-file: ./disk_config/iso.toml
           image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}
-          type: anaconda-iso
 
       - name: Rename Output
         id: rename
