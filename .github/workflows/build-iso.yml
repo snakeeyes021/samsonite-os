@@ -56,13 +56,29 @@ jobs:
             echo "val=latest" >> $GITHUB_OUTPUT
           fi
 
+      # 2. HOTFIX: The 'terra-mesa' repo in F43 is missing local GPG keys, breaking the ISO builder.
+      # We manually remove the terra repo definitions from a temporary copy of the image.
+      - name: Patch Image (Remove Broken Repos)
+        run: |
+          IMAGE_REF="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}"
+          
+          # Pull the image
+          podman pull $IMAGE_REF
+          
+          # Run a container to delete the broken repo config, then commit to a local tag
+          # We force remove any repo file starting with 'terra'
+          podman run --name fixer $IMAGE_REF sh -c "rm -f /etc/yum.repos.d/terra*.repo"
+          podman commit fixer localhost/${{ matrix.image }}-fixed
+          podman rm fixer
+
       - name: Build ISO
         uses: osbuild/bootc-image-builder-action@main
         with:
           types: anaconda-iso
           rootfs: btrfs
           config-file: ./disk_config/iso.toml
-          image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}
+          # Point to our patched local image
+          image: localhost/${{ matrix.image }}-fixed
 
       - name: Rename Output
         id: rename
