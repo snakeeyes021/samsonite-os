@@ -70,7 +70,7 @@ jobs:
             --volume ${{ github.workspace }}:/github/workspace \
             --entrypoint /bin/bash \
             ghcr.io/jasonn3/build-container-installer:main \
-            -c "mknod -m 0660 /dev/loop0 b 7 0 && \
+            -c "mknod -m 0660 /dev/loop0 b 7 0 || true && \
                 mkdir -p /cache/dnf && \
                 sed -i 's/--rootfs-size [0-9]*/--rootfs-size 25/g' Makefile && \
                 make \
