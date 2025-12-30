@@ -60,19 +60,19 @@ jobs:
           echo "Targeting Installer Version: $SAFE_VERSION"
           echo "version=$SAFE_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build ISO
-        # We use @main to ensure the action logic itself (git, scripts) is up to date
-        uses: jasonn3/build-container-installer@main
-        with:
-          arch: x86_64
-          image_name: ${{ matrix.image }}
-          image_repo: ghcr.io/${{ github.repository_owner }}
-          image_tag: ${{ steps.tag_step.outputs.tag }}
-          # Pin to the safe installer version calculated earlier
-          version: ${{ steps.math.outputs.version }}
-          variant: 'Silverblue'
-          iso_name: ${{ matrix.image }}-${{ steps.tag_step.outputs.tag }}.iso
-          rootfs_size: '25' # FIX: Increase the installer's internal size to fit Nvidia/Intel firmware
+      - name: Build ISO (Manual Docker)
+        run: |
+          # Define the build command with explicit ROOTFS_SIZE
+          docker run --rm --privileged \
+            --volume ${{ github.workspace }}:/github/workspace \
+            --env VERSION=${{ steps.math.outputs.version }} \
+            --env VARIANT=Silverblue \
+            --env IMAGE_REPO=ghcr.io/${{ github.repository_owner }} \
+            --env IMAGE_NAME=${{ matrix.image }} \
+            --env IMAGE_TAG=${{ steps.tag_step.outputs.tag }} \
+            --env ISO_NAME=/github/workspace/${{ matrix.image }}-${{ steps.tag_step.outputs.tag }}.iso \
+            --env ROOTFS_SIZE=25 \
+            ghcr.io/jasonn3/build-container-installer:main
 
       - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
