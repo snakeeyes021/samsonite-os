@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+
+name: samsonite-os-nvidia
+description: Samsonite OS - Open Nvidia Drivers
+base-image: ghcr.io/ublue-os/bazzite-gnome-nvidia-open
+image-version: latest # This will be overruled by the branch name during the build
+
+modules:
+  - from-file: _common-modules.yml

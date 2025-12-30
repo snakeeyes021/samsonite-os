@@ -1,0 +1,55 @@
+name: Build ISOs
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'The tag of the OCI images to build ISOs from (e.g., latest, pr-123)'
+        required: true
+        default: 'latest'
+  workflow_run:
+    workflows: ["bluebuild"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  build-isos:
+    # Only run this job if the main build succeeded (for auto-runs) or if manually dispatched
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    name: Build ${{ matrix.image }} ISO
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read # OCI images are public, so only read permission is needed
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - samsonite-os
+          - samsonite-os-nvidia
+          - samsonite-os-nvidia-legacy
+    steps:
+      - name: Set Image Tag
+        id: set_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Disk Image
+        id: build_disk
+        uses: ublue-os/bootc-image-builder-action@v1
+        with:
+          image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.set_tag.outputs.tag }}
+          type: iso
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image }}-${{ steps.set_tag.outputs.tag }}.iso
+          path: ${{ steps.build_disk.outputs.output-path }}
+          retention-days: 7
