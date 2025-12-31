@@ -1,4 +1,4 @@
-name: Build Net-Installers
+name: Build ISOs
 
 on:
   workflow_dispatch:
@@ -15,9 +15,9 @@ on:
       - main
 
 jobs:
-  build-net-installer:
+  build-isos:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    name: Build ${{ matrix.image }} Installer
+    name: Build ${{ matrix.image }} ISO
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,6 +31,17 @@ jobs:
           - samsonite-os-nvidia
           - samsonite-os-nvidia-legacy
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
       - name: Checkout Repo
         uses: actions/checkout@v4
 
@@ -43,122 +54,43 @@ jobs:
             echo "val=latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: Detect Fedora Version (from Image)
-        id: version
+      - name: Patch Image (Remove Broken Repos)
         run: |
-          # 1. Login to GHCR so we can inspect private/internal packages if needed
-          skopeo login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_REF="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}"
           
-          IMAGE_URL="docker://ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}"
-          
-          echo "Inspecting $IMAGE_URL..."
-          
-          # 2. Inspect the image labels to find the version
-          # BlueBuild/UBlue images typically have 'org.opencontainers.image.version' (e.g., "43.20251230.0")
-          FULL_VER=$(skopeo inspect --config $IMAGE_URL | jq -r '.config.Labels["org.opencontainers.image.version"] // empty')
-          
-          # Fallback: if label is missing, assume it's the "latest" Fedora (currently 43) or try to parse other labels
-          if [ -z "$FULL_VER" ]; then
-            echo "WARNING: Could not detect version from labels. Defaulting to 43."
-            MAJOR_VER="43"
-          else
-            # Extract the major version (everything before the first dot)
-            MAJOR_VER=$(echo $FULL_VER | cut -d. -f1)
-          fi
-          
-          echo "Detected Fedora Version: $MAJOR_VER"
-          echo "ver=$MAJOR_VER" >> $GITHUB_OUTPUT
+          # Pull and Patch directly as Root (Sudo)
+          sudo podman pull $IMAGE_REF
+          sudo podman run --name fixer $IMAGE_REF sh -c "rm -f /etc/yum.repos.d/terra*.repo"
+          sudo podman commit fixer localhost/${{ matrix.image }}-fixed
+          sudo podman rm fixer
 
-      - name: Download Fedora Net-Installer
+      - name: Build ISO
         run: |
-          # Use the detected version to build the URL
-          FEDORA_VER="${{ steps.version.outputs.ver }}"
-          BASE_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/${FEDORA_VER}/Server/x86_64/iso/"
+          mkdir -p ./output
           
-          echo "Looking for ISO in: $BASE_URL"
-          
-          # Scrape the directory to find the current point release (e.g., 43-1.2 vs 43-1.5)
-          ISO_NAME=$(curl -s $BASE_URL | grep -o "Fedora-Server-netinst-x86_64-${FEDORA_VER}-.*\.iso" | head -n 1 | sed 's/">//')
-          
-          if [ -z "$ISO_NAME" ]; then
-             echo "Error: Could not find ISO for Fedora ${FEDORA_VER}."
-             exit 1
-          fi
-          
-          echo "Downloading $ISO_NAME..."
-          curl -L -o base.iso "${BASE_URL}${ISO_NAME}"
+          sudo podman run \
+            --rm \
+            --privileged \
+            --security-opt label=type:unconfined_t \
+            -v /var/lib/containers/storage:/var/lib/containers/storage \
+            -v ./output:/output \
+            -v ./disk_config/iso.toml:/config.toml:ro \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            build \
+            --output /output \
+            --type anaconda-iso \
+            --rootfs btrfs \
+            localhost/${{ matrix.image }}-fixed
 
-          # Safety Check
-          FILESIZE=$(stat -c%s "base.iso")
-          if [ $FILESIZE -lt 500000000 ]; then
-            echo "CRITICAL ERROR: File too small ($FILESIZE bytes). Likely a 404/Error page."
-            exit 1
-          fi
-
-      - name: Generate Kickstart File
+      - name: Rename Output
+        id: rename
         run: |
-          cat <<EOF > inst.ks
-          graphical
-          network --bootproto=dhcp
+          sudo find ./output -name "install.iso" -exec mv {} ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso \;
 
-          # Pull the exact image we inspected earlier
-          ostreecontainer --url=registry:ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }} --transport=registry --no-signature-verification
-
-          clearpart --all --initlabel
-          autopart
-          reboot
-          EOF
-
-      - name: Inject Kickstart
-        run: |
-          docker pull fedora:latest
-          
-          docker run --rm \
-            -v $(pwd):/work \
-            -w /work \
-            fedora:latest \
-            /bin/bash -c "dnf install -y lorax && mkksiso --ks inst.ks base.iso ${{ matrix.image }}-${{ steps.tag.outputs.val }}-netinst.iso"
-
-      - name: Upload ISO Artifact
+      - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.image }}-${{ steps.tag.outputs.val }}-iso
-          path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}-netinst.iso
-          retention-days: 1
-
-  release:
-    needs: build-net-installer
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download All ISOs
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "*-iso"
-          path: ./release-isos
-          merge-multiple: true
-
-      - name: Get Date
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-
-      - name: Publish to GitHub Releases
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # 1. Delete old release
-          gh release delete latest-iso --cleanup-tag -y -R ${{ github.repository }} || true
-
-          # 2. Create new release
-          gh release create latest-iso \
-            --title "Latest ISO Build" \
-            --notes "Net-Installers for Samsonite OS. <br/> **Fedora Version:** Auto-Detected from Image. <br/> **Date:** ${{ steps.date.outputs.date }}" \
-            --latest \
-            -R ${{ github.repository }}
-
-          # 3. Upload files
-          gh release upload latest-iso \
-            ./release-isos/*.iso \
-            --clobber \
-            -R ${{ github.repository }}
+          path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
+          # Keep artifacts for 90 days (max for public repos) so links don't break
+          retention-days: 90
