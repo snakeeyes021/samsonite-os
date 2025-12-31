@@ -134,13 +134,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Delete old release (Explicitly targeting the repo to avoid git errors)
+          # 1. Delete old release/tag (Ignore error if it doesn't exist)
           gh release delete latest-iso --cleanup-tag -y -R ${{ github.repository }} || true
 
-          # Create new release
+          # 2. Create the release WITHOUT files first
           gh release create latest-iso \
-            ./release-isos/*.iso \
             --title "Latest ISO Build" \
             --notes "Automated daily build of Samsonite OS. <br/> **Date:** ${{ steps.date.outputs.date }}" \
             --latest \
+            -R ${{ github.repository }}
+
+          # 3. Upload the files using the dedicated upload command (should handle >2GB)
+          gh release upload latest-iso \
+            ./release-isos/*.iso \
+            --clobber \
             -R ${{ github.repository }}
