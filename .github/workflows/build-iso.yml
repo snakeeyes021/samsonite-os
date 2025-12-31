@@ -1,4 +1,4 @@
-name: Build ISOs
+name: Build Net-Installers
 
 on:
   workflow_dispatch:
@@ -15,12 +15,12 @@ on:
       - main
 
 jobs:
-  build-isos:
+  build-net-installer:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    name: Build ${{ matrix.image }} ISO
+    name: Build ${{ matrix.image }} Installer
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: read
       id-token: write
     strategy:
@@ -31,19 +31,6 @@ jobs:
           - samsonite-os-nvidia
           - samsonite-os-nvidia-legacy
     steps:
-      # 1. CRITICAL: Free up ~20GB of space by removing Android SDKs, DotNet, etc.
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          # Optimizations to make this step faster
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
-
       - name: Checkout Repo
         uses: actions/checkout@v4
 
@@ -56,69 +43,56 @@ jobs:
             echo "val=latest" >> $GITHUB_OUTPUT
           fi
 
-      # HOTFIX: Remove broken 'terra' repos to prevent depsolve errors.
-      # We run this as SUDO so the image lands directly in Root's storage.
-      # This avoids the "no space left on device" error caused by duplicating the image via 'podman load'.
-      - name: Patch Image (Remove Broken Repos)
+      - name: Download Fedora Base ISO
         run: |
-          IMAGE_REF="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}"
+          # Downloading Fedora 41 Server Net-Install (~900MB)
+          # We rename it to 'base.iso' for simplicity
+          curl -L -o base.iso "https://download.fedoraproject.org/pub/fedora/linux/releases/41/Server/x86_64/iso/Fedora-Server-netinst-x86_64-41-1.2.iso"
+
+      - name: Generate Kickstart File
+        run: |
+          # This kickstart file tells the installer to pull your specific container image
+          cat <<EOF > inst.ks
+          # Use graphical installer
+          graphical
+          network --bootproto=dhcp
+
+          # CRITICAL: Point to your custom OCI image
+          ostreecontainer --url=registry:ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }} --transport=registry --no-signature-verification
+
+          # Clear partitions and install
+          clearpart --all --initlabel
+          autopart
           
-          # Pull and Patch directly as Root (Sudo)
-          sudo podman pull $IMAGE_REF
-          sudo podman run --name fixer $IMAGE_REF sh -c "rm -f /etc/yum.repos.d/terra*.repo"
-          sudo podman commit fixer localhost/${{ matrix.image }}-fixed
-          sudo podman rm fixer
+          # Reboot after installation
+          reboot
+          EOF
 
-      - name: Build ISO
+      - name: Inject Kickstart (Build ISO)
+        # We run 'mkksiso' inside a Fedora container to avoid dependency hell on Ubuntu
         run: |
-          mkdir -p ./output
+          docker pull fedora:latest
           
-          # We execute the builder container directly using the options the Action would have used
-          # The image is already in sudo's storage from the previous step.
-          sudo podman run \
-            --rm \
-            --privileged \
-            --security-opt label=type:unconfined_t \
-            -v /var/lib/containers/storage:/var/lib/containers/storage \
-            -v ./output:/output \
-            -v ./disk_config/iso.toml:/config.toml:ro \
-            quay.io/centos-bootc/bootc-image-builder:latest \
-            build \
-            --output /output \
-            --type anaconda-iso \
-            --rootfs btrfs \
-            localhost/${{ matrix.image }}-fixed
+          # Run the container to modify the ISO
+          docker run --rm \
+            -v $(pwd):/work \
+            -w /work \
+            fedora:latest \
+            /bin/bash -c "dnf install -y lorax && mkksiso --ks inst.ks base.iso ${{ matrix.image }}-${{ steps.tag.outputs.val }}-netinst.iso"
 
-      - name: Rename Output
-        id: rename
-        run: |
-          sudo find ./output -name "install.iso" -exec mv {} ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso \;
-
-      - name: Upload ISO
+      - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.image }}-${{ steps.tag.outputs.val }}-iso
-          path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
+          path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}-netinst.iso
           retention-days: 1
 
   release:
-    needs: build-isos
+    needs: build-net-installer
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      # 1. CRITICAL: Free space so we can download 21GB of ISOs
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@v1.3.1
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false
-
       - name: Download All ISOs
         uses: actions/download-artifact@v4
         with:
@@ -134,17 +108,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # 1. Delete old release/tag (Ignore error if it doesn't exist)
+          # 1. Delete old release
           gh release delete latest-iso --cleanup-tag -y -R ${{ github.repository }} || true
 
-          # 2. Create the release WITHOUT files first
+          # 2. Create new empty release
           gh release create latest-iso \
             --title "Latest ISO Build" \
-            --notes "Automated daily build of Samsonite OS. <br/> **Date:** ${{ steps.date.outputs.date }}" \
+            --notes "Net-Installers for Samsonite OS. Requires Internet. <br/> **Date:** ${{ steps.date.outputs.date }}" \
             --latest \
             -R ${{ github.repository }}
 
-          # 3. Upload the files using the dedicated upload command (should handle >2GB)
+          # 3. Upload all 3 ISOs to the same release
           gh release upload latest-iso \
             ./release-isos/*.iso \
             --clobber \
