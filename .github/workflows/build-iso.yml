@@ -100,13 +100,26 @@ jobs:
           name: ${{ matrix.image }}-${{ steps.tag.outputs.val }}-iso
           path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
           retention-days: 1
-  release: 
+
+  release:
     needs: build-isos
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download Artifacts
+      # 1. CRITICAL: Free space so we can download 21GB of ISOs
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - name: Download All ISOs
         uses: actions/download-artifact@v4
         with:
           pattern: "*-iso"
@@ -124,7 +137,7 @@ jobs:
           # Delete the old release to avoid conflicts
           gh release delete latest-iso --cleanup-tag -y || true
 
-          # Create new release with GH CLI (Handles files >2GB)
+          # Create new release with GH CLI
           gh release create latest-iso \
             ./release-isos/*.iso \
             --title "Latest ISO Build" \
