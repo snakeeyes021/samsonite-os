@@ -20,7 +20,7 @@ jobs:
     name: Build ${{ matrix.image }} ISO
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: read
       id-token: write
     strategy:
@@ -94,23 +94,43 @@ jobs:
         run: |
           sudo find ./output -name "install.iso" -exec mv {} ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso \;
 
-      - name: Upload ISO
+      - name: Upload ISO Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.image }}-${{ steps.tag.outputs.val }}-iso
           path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
-          retention-days: 7
+          retention-days: 1
+          if-no-files-found: error
+
+  # NEW JOB: Runs only after all builds are successful
+  release:
+    needs: build-isos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create the release
+    steps:
+      - name: Download All ISOs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: *-iso
+          path: ./release-isos
+          merge-multiple: true
 
       - name: Get Date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Publish to GitHub Releases
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch'
-        with:
-          tag_name: latest-iso
-          name: "Latest ISO Build"
-          body: "Automated daily build of Samsonite OS. \n\n**Date:** ${{ steps.date.outputs.date }}"
-          files: ./*.iso
-          make_latest: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 1. Delete the old "latest-iso" release if it exists to avoid conflicts
+          gh release delete latest-iso --cleanup-tag -y || true
+
+          # 2. Create a new release and upload all ISOs found in the folder
+          # The GitHub CLI (gh) automatically handles large files >2GB via chunking
+          gh release create latest-iso \
+            ./release-isos/*.iso \
+            --title "Latest ISO Build" \
+            --notes "Automated daily build of Samsonite OS. <br/> **Date:** ${{ steps.date.outputs.date }}" \
+            --latest
