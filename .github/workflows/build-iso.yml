@@ -31,9 +31,11 @@ jobs:
           - samsonite-os-nvidia
           - samsonite-os-nvidia-legacy
     steps:
+      # 1. CRITICAL: Free up ~20GB of space by removing Android SDKs, DotNet, etc.
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
+          # Optimizations to make this step faster
           tool-cache: true
           android: true
           dotnet: true
@@ -54,6 +56,9 @@ jobs:
             echo "val=latest" >> $GITHUB_OUTPUT
           fi
 
+      # HOTFIX: Remove broken 'terra' repos to prevent depsolve errors.
+      # We run this as SUDO so the image lands directly in Root's storage.
+      # This avoids the "no space left on device" error caused by duplicating the image via 'podman load'.
       - name: Patch Image (Remove Broken Repos)
         run: |
           IMAGE_REF="ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ steps.tag.outputs.val }}"
@@ -68,6 +73,8 @@ jobs:
         run: |
           mkdir -p ./output
           
+          # We execute the builder container directly using the options the Action would have used
+          # The image is already in sudo's storage from the previous step.
           sudo podman run \
             --rm \
             --privileged \
