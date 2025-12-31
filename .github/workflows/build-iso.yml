@@ -92,7 +92,7 @@ jobs:
       - name: Rename Output
         id: rename
         run: |
-          mv ./output/anaconda-iso/install.iso ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
+          sudo find ./output -name "install.iso" -exec mv {} ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso \;
 
       - name: Upload ISO
         uses: actions/upload-artifact@v4
