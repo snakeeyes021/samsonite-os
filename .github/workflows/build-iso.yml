@@ -134,12 +134,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Delete the old release to avoid conflicts
-          gh release delete latest-iso --cleanup-tag -y || true
+          # Delete old release (Explicitly targeting the repo to avoid git errors)
+          gh release delete latest-iso --cleanup-tag -y -R ${{ github.repository }} || true
 
-          # Create new release with GH CLI
+          # Create new release
           gh release create latest-iso \
             ./release-isos/*.iso \
             --title "Latest ISO Build" \
             --notes "Automated daily build of Samsonite OS. <br/> **Date:** ${{ steps.date.outputs.date }}" \
-            --latest
+            --latest \
+            -R ${{ github.repository }}
