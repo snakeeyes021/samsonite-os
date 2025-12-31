@@ -46,10 +46,6 @@ To switch to SamsoniteOS from an existing GNOME-based Fedora Atomic installation
     systemctl reboot
     ```
 
-**ISO Installation:**
-
-*ISO downloads coming soon.*
-
 ### Verification
 
 These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running:
@@ -57,3 +53,15 @@ These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](ht
 ```bash
 cosign verify --key cosign.pub ghcr.io/snakeeyes021/samsonite-os
 ```
+
+## ISO Installation
+
+Latest automated daily builds (Offline ISOs):
+
+| Version | Download Link |
+| :--- | :--- |
+| **Standard** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-latest-iso.zip) |
+| **Nvidia** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-nvidia-latest-iso.zip) |
+| **Nvidia Legacy** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-nvidia-legacy-latest-iso.zip) |
+
+*Note: These links redirect to the latest GitHub Artifact. You must unzip the file to get the `.iso`.*
