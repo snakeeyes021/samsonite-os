@@ -82,7 +82,7 @@ jobs:
             -v /var/lib/containers/storage:/var/lib/containers/storage \
             -v ./output:/output \
             -v ./disk_config/iso.toml:/config.toml:ro \
-            quay.io/centos-bootc/bootc-image-builder:latest \
+            quay.io/centos-bootc/bootc-image-builder:stream9 \
             build \
             --output /output \
             --type anaconda-iso \
