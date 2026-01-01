@@ -99,5 +99,4 @@ jobs:
         with:
           name: ${{ matrix.image }}-${{ steps.tag.outputs.val }}-iso
           path: ./${{ matrix.image }}-${{ steps.tag.outputs.val }}.iso
-          # Keep artifacts for 90 days (max for public repos) so links don't break
-          retention-days: 90
+          retention-days: 7
