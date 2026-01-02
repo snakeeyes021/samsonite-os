@@ -5,6 +5,10 @@ modules:
       - source: ../files/system
         destination: /
 
+  - type: gschema-overrides
+    include:
+      - zz99-samsonite.gschema.override
+
   - type: containerfile
     containerfiles:
       - ../containerfiles/dnf-overrides
