@@ -69,10 +69,10 @@ cosign verify --key cosign.pub ghcr.io/snakeeyes021/samsonite-os
 
 ## ISO Installation
 
-Generating ISOs turns out to be the trickiest part of maintaining a custom OS image like this, both in terms of the pipeline (Bazzite, and thus SamsoniteOS, is built on bleeding-edge Fedora Rawhide; if they push a change to, e.g., grub that flumoxes Anaconda or the build system that smooshes Anaconda and our image together into an ISO, then the ISO build pipeline breaks and there's not much we can do about it except wait) and logistics (publication, storage, costs, etc). At the time of this writing, just such a change in Fedora seems to be breaking the pipeline, best we can tell.
+Generating ISOs turns out to be the trickiest part of maintaining a custom OS image like this, both in terms of the pipeline (Bazzite, and thus SamsoniteOS, is built on bleeding-edge Fedora Rawhide; if Fedora pushes a change to, e.g., grub that flumoxes the build system that smooshes Anaconda and our image together into an ISO, then the ISO build pipeline breaks and there's not much we can do about it except wait) and logistics (publication, storage, costs, etc). At the time of this writing, just such a change in Fedora seems to be breaking the pipeline, best we can tell.
 
 For this reason, we do not currently have ISOs available for download, and even if/when we are able to begin generating them again, we cannot guarantee consistent availability. We highly recommend users install via a rebase (using one of the three commands above) from a GNOME-based Fedora Atomic distribution. To do so, simply: 
-1. Download an ISO for Fedora Silverblue, Bluefin, or Bazzite (we recommend Bazzite). 
+1. Download an ISO for Fedora Silverblue, Bluefin, or Bazzite (we recommend Bazzite; make sure to select a version with the GNOME desktop). 
 2. Install as you normally would. 
 3. Immediately run one of the above commands to rebase to your preferred version of SamsoniteOS. 
 4. Reboot. 
