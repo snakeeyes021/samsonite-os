@@ -27,19 +27,32 @@ The purpose of SamsoniteOS is to round out the offerings of Bazzite, both with s
 > [!CAUTION]
 > **GNOME ONLY:** This image is based on GNOME. **Do not rebase** from a KDE-based image (like Kinoite or mainline Bazzite), as this can cause significant desktop environment conflicts. If you are currently on KDE, please install fresh using an ISO.  
 
-*Multiple image channels coming soon:*
-- ***Nvidia Closed*** *(pinned to driver version 580 for legacy card support)*
-- ***Nvidia Open*** *(Nvidia GTX 16xx, RTX 20xx and above)*
-- ***Intel/AMD*** *(all others)*  
+We have three images available, depending on your hardware:
+
+- **`samsonite-os`**: For Intel and AMD GPUs.
+- **`samsonite-os-nvidia`**: For modern Nvidia GPUs (GTX 16xx, RTX 20xx and newer).
+- **`samsonite-os-nvidia-legacy`**: For legacy Nvidia GPUs (Pascal/GTX 10xx series and older).
 
 **Rebasing from Silverblue, Bluefin, or Bazzite (GNOME):**
 
-To switch to SamsoniteOS from an existing GNOME-based Fedora Atomic installation:
+To switch to SamsoniteOS from an existing GNOME-based Fedora Atomic installation, choose the command that corresponds to your hardware:
 
 1.  **Rebase to the signed image:**
-    ```bash
-    rpm-ostree rebase ostree-image-signed:docker://ghcr.io/snakeeyes021/samsonite-os:latest
-    ```
+
+    *   **Intel/AMD:**
+        ```bash
+        rpm-ostree rebase ostree-image-signed:docker://ghcr.io/snakeeyes021/samsonite-os:latest
+        ```
+
+    *   **Nvidia (Modern):**
+        ```bash
+        rpm-ostree rebase ostree-image-signed:docker://ghcr.io/snakeeyes021/samsonite-os-nvidia:latest
+        ```
+
+    *   **Nvidia (Legacy):**
+        ```bash
+        rpm-ostree rebase ostree-image-signed:docker://ghcr.io/snakeeyes021/samsonite-os-nvidia-legacy:latest
+        ```
 
 2.  **Reboot:**
     ```bash
@@ -56,12 +69,11 @@ cosign verify --key cosign.pub ghcr.io/snakeeyes021/samsonite-os
 
 ## ISO Installation
 
-Latest automated daily builds (Offline ISOs):
+Generating ISOs turns out to be the trickiest part of maintaining a custom OS image like this, both in terms of the pipeline (Bazzite, and thus SamsoniteOS, is built on bleeding-edge Fedora Rawhide; if they push a change to, e.g., grub that flumoxes Anaconda or the build system that smooshes Anaconda and our image together into an ISO, then the ISO build pipeline breaks and there's not much we can do about it except wait) and logistics (publication, storage, costs, etc). At the time of this writing, just such a change in Fedora seems to be breaking the pipeline, best we can tell.
 
-| Version | Download Link |
-| :--- | :--- |
-| **Standard** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-latest-iso.zip) |
-| **Nvidia** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-nvidia-latest-iso.zip) |
-| **Nvidia Legacy** | [Download ISO (Zip)](https://nightly.link/snakeeyes021/samsonite-os/workflows/build-iso/main/samsonite-os-nvidia-legacy-latest-iso.zip) |
-
-*Note: These links redirect to the latest GitHub Artifact. You must unzip the file to get the `.iso`.*
+For this reason, we do not currently have ISOs available for download, and even if/when we are able to begin generating them again, we cannot guarantee consistent availability. We highly recommend users install via a rebase (using one of the three commands above) from a GNOME-based Fedora Atomic distribution. To do so, simply: 
+1. Download an ISO for Fedora Silverblue, Bluefin, or Bazzite (we recommend Bazzite). 
+2. Install as you normally would. 
+3. Immediately run one of the above commands to rebase to your preferred version of SamsoniteOS. 
+4. Reboot. 
+5. Profit.
