@@ -45,6 +45,11 @@ modules:
         - bluefin-dx-groups.service
         - incus-workaround.service
 
+  - type: gnome-extensions
+    install:
+      - 307  # Dash to Dock
+      - 7065 # Tiling Shell
+
   - type: default-flatpaks
     configurations:
       - scope: system
@@ -62,5 +67,13 @@ modules:
           - org.gimp.GIMP
           - org.kde.kdenlive
           - com.obsproject.Studio
+          - org.gtk.Gtk3theme.adw-gtk3
+          - org.gtk.Gtk3theme.adw-gtk3-dark
 
   - type: signing
+
+  - type: script
+    scripts:
+      - chmod +x /usr/bin/firstboot-dispatcher.sh
+      - chmod +x /usr/share/firstboot/scripts/*
+      - systemctl enable firstboot-setup.service
