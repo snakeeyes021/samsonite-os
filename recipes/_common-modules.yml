@@ -5,6 +5,10 @@ modules:
       - source: ../files/system
         destination: /
 
+  - type: gschema-overrides
+    include:
+      - zz99-samsonite.gschema.override
+
   - type: containerfile
     containerfiles:
       - ../containerfiles/dnf-overrides
@@ -45,6 +49,11 @@ modules:
         - bluefin-dx-groups.service
         - incus-workaround.service
 
+  - type: gnome-extensions
+    install:
+      - 307  # Dash to Dock
+      - 7065 # Tiling Shell
+
   - type: default-flatpaks
     configurations:
       - scope: system
@@ -62,5 +71,12 @@ modules:
           - org.gimp.GIMP
           - org.kde.kdenlive
           - com.obsproject.Studio
+          - org.gtk.Gtk3theme.adw-gtk3
+          - org.gtk.Gtk3theme.adw-gtk3-dark
 
   - type: signing
+
+  - type: script
+    scripts:
+      - setup-permissions.sh
+      - build-dconf.sh
