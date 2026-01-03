@@ -8,6 +8,7 @@ button-layout='close:'
 
 [org.gnome.settings-daemon.plugins.color]
 night-light-enabled=true
+night-light-schedule-automatic=true
 
 [org.gnome.desktop.background]
 picture-uri='file:///usr/share/backgrounds/samsonite/background-l.jpg'
