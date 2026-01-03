@@ -1,8 +1,8 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # We define the version of OUR CONFIGURATION here.
-# Increment this number whenever you change the scripts!
+# Increment this number whenever you change the scripts! (specifically, the startup scripts)
 CURRENT_CONFIG_VERSION="1"
 
 STATE_FILE="/var/lib/bluebuild-config-version"
