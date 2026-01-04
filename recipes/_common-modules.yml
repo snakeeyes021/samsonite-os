@@ -40,6 +40,10 @@ modules:
       - zsh
       - python3-ramalama
 
+  - type: dnf
+    install:
+      - cursor
+
   - type: systemd
     system:
       enabled:
