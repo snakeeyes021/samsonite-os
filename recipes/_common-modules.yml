@@ -42,7 +42,8 @@ modules:
 
   - type: dnf
     install:
-      - cursor
+      packages:
+        - cursor
 
   - type: systemd
     system:
