@@ -46,6 +46,10 @@
 - [ ] `install-gemini-cli`: `brew install gemini-cli`.
 - [ ] `configure-heroic`:
 - [ ] **UI/UX Atoms:**
+    - [ ] `fix-flatpak-theming`:
+        - `sudo flatpak override --filesystem=xdg-data/themes`
+        - `sudo flatpak mask org.gtk.Gtk3theme.adw-gtk3`
+        - `sudo flatpak mask org.gtk.Gtk3theme.adw-gtk3-dark`
     - [ ] figure out terminal recipes (starship/no starship, light theme/system theme, etc)
     - [ ] `set-window-controls-right`: Sets `:minimize,maximize,close`.
     - [ ] `set-window-controls-left-gnome`: Sets `close:`. (this is the default, but it needs to exist if someone runs the above and wants to return to default without nuking their whole dconf file)
