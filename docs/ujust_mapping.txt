@@ -75,7 +75,7 @@ org.darktable.Darktable             # Darktable (Editor)
 ujust install-video:
 org.kde.kdenlive                    # Kdenlive
 org.bunkus.mkvtoolnix-gui           # MKVToolNix
-org.gnome.gitlab.YaLTeR.VideoTrimmer# Video Trimmer
+org.gnome.gitlab.YaLTeR.VideoTrimmer # Video Trimmer
 com.github.unrud.VideoDownloader    # Video Downloader
 com.obsproject.Studio               # OBS Studio
 
@@ -128,8 +128,8 @@ ujust install-dropbox               # Installs maestral gui
 ujust install-basic
 ujust install-daily
 ujust install-productivity
-org.videolan.VLC                      # VLC Media Player
-org.cvfosammmm.Setzer                 # Setzer (LaTex editor)
+org.videolan.VLC                    # VLC Media Player
+org.cvfosammmm.Setzer               # Setzer (LaTex editor)
 
 ujust install-normie:
 ujust install-basic
