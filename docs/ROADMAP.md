@@ -31,7 +31,7 @@
 ## 📦 Default Software
 - [ ] **Winboat:** Determine installation (DNF/Flatpak) and add to system defaults.
 - [ ] **Implement** System-level GNOME Boxes + Virt-Manager
-- [ ] **Implement** Starship terminal prompt by default with light-theme terminal (steal from Bluefine)
+- [ ] **Implement** Starship terminal prompt by default with light-theme terminal (steal from Bluefin)
 
 ## 🌳 The `ujust` Architecture Tree
 *The master plan for `files/system/usr/share/ublue-os/just/99-samsonite.just`.*
