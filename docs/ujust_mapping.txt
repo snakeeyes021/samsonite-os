@@ -22,7 +22,7 @@ org.gnome.TextEditor                # Text Editor
 org.gnome.Showtime                  # Video Player
 io.github.flattool.Warehouse        # WareHouse
 
-(system)
+(system--dnf)
 gnome-boxes                         # Boxes (System Package)
 virt-manager                        # Virtual Machine Manager (System Package)
 
