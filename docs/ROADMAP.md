@@ -8,10 +8,10 @@
     - [x] Update "Rebasing" section: Explicitly warn about the Silverblue blocker (Signed Image vs. Unsigned Silverblue Policy).
 - [ ] **Curate & Fix Flatpaks**
     - [x] **Fix "Nag on Boot":** Investigate and disable the repetitive Flatpak installation check on every boot.
-    - [ ] **Restore Missing Apps:**
-        - [ ] **Research:** Audit a fresh Silverblue rebase to identify *all* missing base apps (beyond just Firefox/Extension Manager).
-        - [ ] Ensure identified apps are in the default list.
-    - [ ] **Curate Defaults:** Review `recipes/_common-modules.yml` and remove unwanted placeholders.
+    - [x] **Restore Missing Apps:**
+        - [x] **Research:** Audit a fresh Silverblue rebase to identify *all* missing base apps (beyond just Firefox/Extension Manager).
+        - [x] Ensure identified apps are in the default list.
+    - [x] **Curate Defaults:** Review `recipes/_common-modules.yml` and remove unwanted placeholders.
         - [ ] **Research:** Can we inject the "Discrete GPU" preference file without forcing the app install? (if so, that should be a default; if not we may need to install Heroic by default)
 
 
