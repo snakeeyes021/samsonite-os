@@ -97,6 +97,7 @@ ujust install-zed                   # Zed Editor (Script)
 ujust install-gemini-cli            # Gemini CLI (Script)
 io.podman_desktop.PodmanDesktop     # Podman
 org.gnome.dspy                      # D-Spy
+ca.desrt.dconf-editor               # DConf Editor
 
 ujust install-bluefin-dx:
 org.freedesktop.Bustle              # Bustle
