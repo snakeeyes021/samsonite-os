@@ -44,6 +44,10 @@ be.alexandervanhee.gradia           # Gradia (Screenshot/photo Markup)
 net.cozic.joplin_desktop            # Joplin (Notes App)
 app.drey.Warp                       # Warp (File Transfer Helper)
 
+ujust install-comms:
+org.signal.Signal                   # Signal Desktop
+dev.vencord.Vesktop                 # Vesktop (Discord with Audio Screenshare)
+
 ujust install-daily:
 dev.geopjr.Tuba                     # Tuba (Mastodon Client)
 io.gitlab.news_flash.NewsFlash      # Newsflash (RSS Reader)
@@ -122,6 +126,7 @@ ujust install-creative
 ujust install-daily
 ujust install-productivity
 ujust install-basic
+install-comms
 
 ujust install-dewy:
 ujust install-zed
@@ -129,6 +134,7 @@ ujust install-dropbox               # Installs maestral gui
 ujust install-basic
 ujust install-daily
 ujust install-productivity
+install-comms
 org.videolan.VLC                    # VLC Media Player
 org.cvfosammmm.Setzer               # Setzer (LaTex editor)
 
@@ -136,6 +142,7 @@ ujust install-normie:
 ujust install-basic
 ujust install-daily
 ujust install-productivity
+install-comms
 
 
 CONFIG
