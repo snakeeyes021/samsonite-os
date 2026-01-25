@@ -47,22 +47,39 @@ io.gitlab.news_flash.NewsFlash      # Newsflash
 com.github.geigi.cozy               # Cozy
 org.gnome.Music                     # GNOME Music
 
-ujust install-music:
+ujust install-audio:
 org.ardour.Ardour                   # Ardour
+info.puredata.Pd                    # Pure Data (Vanilla)
+net.purrdata.PurrData               # Purr Data
+org.audacityteam.Audacity           # Audacity
+net.sourceforge.VMPK                # VMPK
+org.pipewire.Helvum                 # Helvum
+ujust install-soundthread           # SoundThread (Custom Script)
+
+ujust install-graphics:
+org.kde.krita                       # Krita
+org.blender.Blender                 # Blender
+org.inkscape.Inkscape               # Inkscape
+org.gimp.GIMP                       # Gimp
+com.orama_interactive.Pixelorama    # Pixelorama
+nl.hjdskes.gcolor3                  # Color Picker
+
+ujust install-photos:
+org.kde.digikam                     # DigiKam (Manager)
+org.darktable.Darktable             # Darktable (Editor)
+
+ujust install-video:
+org.kde.kdenlive                    # Kdenlive
+
+ujust install-notation:
 org.musescore.MuseScore             # Musescore
 org.frescobaldi.Frescobaldi         # Frescobaldi
 
-ujust install-creative
-org.blender.Blender                 # Blender
-org.kde.krita                       # Krita
-org.inkscape.Inkscape               # Inkscape
-org.gimp.GIMP                       # Gimp
-org.kde.kdenlive                    # Kdenlive (Added)
-# TODO: Something for photos
-
-ujust install-dev
-- ujust install-zed
-- ujust install-gemini-cli
+ujust install-dev:
+org.gnome.Builder                   # GNOME Builder (IDE)
+re.sonny.Workbench                  # Workbench
+ujust install-zed                   # Zed Editor (Script)
+ujust install-gemini-cli            # Gemini CLI (Script)
 
 ujust install-bluefin-dx:
 org.freedesktop.Bustle              # Bustle
@@ -72,11 +89,17 @@ me.iepure.devtoolbox                # Dev Toolbox
 io.github.getnf.embellish           # Embellish
 org.pipewire.Helvum                 # Helvum
 
-ujust install-matt
+ujust install-creative:
+- ujust install-audio
+- ujust install-graphics
+- ujust install-photos
+- ujust install-video
+- ujust install-notation
+
+ujust install-matt:
 - ujust install-dev
 - ujust install-bluefin-dx
 - ujust install-creative
-- ujust install-music
 - ujust install-daily
 - ujust install-productivity
 - ujust install-basic
@@ -84,6 +107,6 @@ ujust install-matt
 
 
 CONFIG
-ujust configure-dev
+ujust configure-dev:
 - ujust configure-vscode
 - ujust configure-cursor
