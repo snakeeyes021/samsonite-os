@@ -32,48 +32,17 @@ configure-heroic:
 install-soundthread:
     echo "TODO: Implement install-soundthread"
 
-# Install Winboat (via Gearlever)
-# Install Winboat (via Gearlever)
+# Update all AppImages managed by Gearlever
+update-appimages:
+    /usr/bin/update-appimages
+
+# Install Winboat (Example: GitHub Source)
 install-winboat:
-    #!/usr/bin/env bash
-    set -e # Exit immediately if a command fails
-    echo "Installing Winboat..."
-    flatpak install -y flathub it.mijorus.gearlever
-    
-    echo "Fetching latest Winboat AppImage..."
-    # No $$ needed here because we are inside a bash shebang block!
-    # No && \ needed because variables persist in this block.
-    URL=$(curl -s https://api.github.com/repos/TibixDev/winboat/releases/latest | jq -r '.assets[] | select(.name | test("x86_64.AppImage$")) | .browser_download_url')
-    
-    if [ -z "$URL" ]; then
-        echo "Error: Could not find download URL"
-        exit 1
-    fi
-
-    curl -L -o /tmp/WinBoat.AppImage "$URL"
-    echo "Opening in Gearlever..."
-    flatpak run it.mijorus.gearlever /tmp/WinBoat.AppImage
-
-# Update Gearlever AppImages
-update-gearlever:
-    #!/usr/bin/bash
-    if ! flatpak list | grep -q "it.mijorus.gearlever"; then
-        echo "Gearlever not installed. Skipping."
-        exit 0
-    fi
-    APPS=$(flatpak run it.mijorus.gearlever --list-installed)
-    if [ -z "$APPS" ]; then
-        echo "No AppImages managed by Gearlever found."
-        exit 0
-    fi
-    echo "=== Updating Gearlever AppImages ==="
-    echo "$APPS" | while read -r APP_PATH; do
-        if [ -n "$APP_PATH" ]; then
-            APP_NAME=$(basename "$APP_PATH")
-            echo "-> Checking $APP_NAME..."
-            flatpak run it.mijorus.gearlever --update "$APP_PATH"
-        fi
-    done
+    /usr/bin/install-appimage \
+      "WinBoat" \
+      "GithubUpdater" \
+      "https://github.com/TibixDev/winboat" \
+      "WinBoat-*-x86_64.AppImage"
 
 # UI/UX Atoms
 fix-flatpak-theming:

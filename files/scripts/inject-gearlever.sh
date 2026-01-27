@@ -17,7 +17,7 @@ fi
 # CONFIGURATION: The command to inject
 # We use [custom_commands] as that is the correct Topgrade syntax for shell hooks
 SECTION="[custom_commands]"
-INJECTION='"Gearlever" = "just update-gearlever"'
+INJECTION='"Gearlever" = "just update-appimages"'
 
 echo "Injecting Gearlever update into $CONFIG_FILE..."
 
