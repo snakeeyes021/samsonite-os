@@ -117,4 +117,6 @@
 - [ ] Check that Boxes is installing as system package and is cross-compatible with VMM
 - [ ] Confirm that Winboat is best as app-image (RPM is published on github releases page, so we could be doing this as a system package; the issue is that the appimage setup is not frictionless).
     - [ ] Test appimage to confirm is working. If not, try RPM. Proceed based on findings
+    - [ ] Winboat requires FreeRDP
 - [ ] Change names for everything (can't use Samsonite almost certainly; probably go with RedFox)
+- [ ] Add sound theme change
