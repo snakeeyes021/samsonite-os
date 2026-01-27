@@ -38,11 +38,11 @@ perform_update_check() {
             if ! flatpak run it.mijorus.gearlever --update "$APP_PATH" -y > "$LOG_FILE" 2>&1; then
                 # Update failed, check if it was due to being busy
                 if grep -qi "Text file busy" "$LOG_FILE"; then
-                    echo "   [!] Update failed: App is running."
+                    echo "   ⚠️  Update failed: App is running."
                     BUSY_APPS+=("$APP_NAME")
                 else
                     # Some other error occurred
-                    echo "   [!] Update failed with error:"
+                    echo "   ⚠️ Update failed with error:"
                     cat "$LOG_FILE"
                     FAILED_APPS+=("$APP_NAME")
                 fi
