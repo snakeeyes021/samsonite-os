@@ -10,51 +10,47 @@ PRERELEASE="${5:-false}"
 
 echo "=== Handling AppImage: $APP_NAME ==="
 
-# --- STEP 1: Determine Download URL ---
+# --- 1. Download ---
 DL_URL=""
 
 if [ "$MANAGER" == "GithubUpdater" ]; then
-    # Extract "Owner/Repo"
     REPO_SLUG=$(echo "$REPO_URL" | sed 's|https://github.com/||')
-    
-    # Convert Glob (Name-*.AppImage) to Regex (Name-.*\.AppImage) for jq
     JQ_REGEX=$(echo "$FILE_PATTERN" | sed 's/\./\\./g; s/\*/.*/g')
 
-    echo "   Fetching latest release info from $REPO_SLUG..."
-    API_URL="https://api.github.com/repos/${REPO_SLUG}/releases/latest"
+    echo "   Fetching release info from $REPO_SLUG..."
+    JSON_RESPONSE=$(curl -s -H "User-Agent: Mozilla/5.0 (compat; BlueBuild/1.0)" "https://api.github.com/repos/${REPO_SLUG}/releases/latest")
     
-    # Extract the browser_download_url for the matching asset
-    DL_URL=$(curl -s "$API_URL" | jq -r --arg regex "$JQ_REGEX" '.assets[] | select(.name | test($regex)) | .browser_download_url' | head -n 1)
+    # Fix: Case-insensitive match for the download URL
+    DL_URL=$(echo "$JSON_RESPONSE" | jq -r --arg regex "$JQ_REGEX" \
+        '.assets[] | select(.name | test($regex; "i")) | .browser_download_url' | head -n 1)
+
+    if [ -z "$DL_URL" ] || [ "$DL_URL" == "null" ]; then
+        echo "Error: Could not find asset matching '$FILE_PATTERN'."
+        exit 1
+    fi
 
 elif [ "$MANAGER" == "StaticFileUpdater" ]; then
     DL_URL="$REPO_URL"
-fi
-
-if [ -z "$DL_URL" ] || [ "$DL_URL" == "null" ]; then
-    echo "Error: Could not determine download URL for $APP_NAME. Check your pattern or repo."
-    exit 1
 fi
 
 echo "   Downloading from: $DL_URL"
 TEMP_FILE="/tmp/${APP_NAME}_install.AppImage"
 curl -L -o "$TEMP_FILE" "$DL_URL"
 
-# --- STEP 2: Integrate (Silent Install) ---
+# --- 2. Integrate ---
 echo "   Integrating into Gearlever..."
-# Ensure Gearlever is installed
 if ! flatpak list | grep -q "it.mijorus.gearlever"; then
-    echo "Installing Gearlever..."
     flatpak install -y flathub it.mijorus.gearlever
 fi
 
 flatpak run it.mijorus.gearlever --integrate "$TEMP_FILE" -y
 rm -f "$TEMP_FILE"
 
-# --- STEP 3: Configure Updates ---
+# --- 3. Configure Updates ---
 echo "   Configuring Update Metadata..."
 
-# Find the installed path (Gearlever may rename it)
-INSTALLED_PATH=$(flatpak run it.mijorus.gearlever --list-installed | grep -i "$APP_NAME" | head -n 1)
+# Fix: Use awk to get the clean file path
+INSTALLED_PATH=$(flatpak run it.mijorus.gearlever --list-installed | grep -i "$APP_NAME" | head -n 1 | awk '{print $NF}')
 
 if [ -z "$INSTALLED_PATH" ]; then
     echo "Error: Integration finished, but file not found in Gearlever list."

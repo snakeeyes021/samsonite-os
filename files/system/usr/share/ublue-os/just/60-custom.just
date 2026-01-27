@@ -42,7 +42,7 @@ install-winboat:
       "WinBoat" \
       "GithubUpdater" \
       "https://github.com/TibixDev/winboat" \
-      "WinBoat-*-x86_64.AppImage"
+      "winboat-*-x86_64.AppImage"
 
 # UI/UX Atoms
 fix-flatpak-theming:
