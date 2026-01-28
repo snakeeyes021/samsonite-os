@@ -120,3 +120,4 @@
     - [x] Winboat requires FreeRDP
 - [ ] Change names for everything (can't use Samsonite almost certainly; probably go with RedFox)
 - [ ] Add sound theme change
+- [ ] Dock defaults
