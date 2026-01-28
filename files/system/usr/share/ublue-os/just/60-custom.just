@@ -125,7 +125,7 @@ install-daily:
 
 # Install Audio Production Apps
 install-audio:
-    just install-soundthread
+    install-soundthread
     flatpak install -y flathub \
         org.ardour.Ardour \
         info.puredata.Pd \
@@ -161,7 +161,7 @@ install-video:
 
 # Install Compatibility Tools
 install-compatibility:
-    just install-winboat
+    install-winboat
     flatpak install -y flathub \
         com.usebottles.bottles
 
@@ -185,9 +185,9 @@ install-gnome-dev:
 
 # Install Development Apps
 install-dev:
-    just install-gnome-dev
-    just install-zed
-    just install-gemini-cli
+    install-gnome-dev
+    install-zed
+    install-gemini-cli
     flatpak install -y flathub \
         io.podman_desktop.PodmanDesktop \
         org.gnome.dspy \
@@ -205,58 +205,58 @@ install-bluefin-dx:
 
 # Install Creative Suite
 install-creative:
-    just install-audio
-    just install-graphics
-    just install-photos
-    just install-video
-    just install-notation
-    just install-writing
+    install-audio
+    install-graphics
+    install-photos
+    install-video
+    install-notation
+    install-writing
 
 
 # Level 2: Molecules (Logical Groups)
 
 # Install Matt's Bundle
 install-matt:
-    just install-dev
-    just install-bluefin-dx
-    just install-creative
-    just install-daily
-    just install-productivity
-    just install-compatibility
-    just install-basic
-    just install-comms
+    install-dev
+    install-bluefin-dx
+    install-creative
+    install-daily
+    install-productivity
+    install-compatibility
+    install-basic
+    install-comms
 
 # Install Dewy's Bundle
 install-dewy:
-    just install-zed
-    just install-dropbox
-    just install-basic
-    just install-daily
-    just install-productivity
-    just install-comms
+    install-zed
+    install-dropbox
+    install-basic
+    install-daily
+    install-productivity
+    install-comms
     flatpak install -y flathub \
         org.videolan.VLC \
         org.cvfosammmm.Setzer
 
 # Install Normie Bundle
 install-normie:
-    just install-basic
-    just install-daily
-    just install-productivity
-    just install-comms
+    install-basic
+    install-daily
+    install-productivity
+    install-comms
 
 
 # Level 3: Organisms (User Bootstraps & Configs)
 
 # Configure Dev Environment
 configure-dev:
-    just configure-vscode
-    just configure-cursor
+    configure-vscode
+    configure-cursor
 
 # Configure Matt's Environment
 configure-matt:
     mkdir -p ~/dev
-    just configure-dev
+    configure-dev
     # just runs hardware atoms here eventually
 
 # Configure Dewy's Environment
@@ -273,14 +273,14 @@ configure-normie:
 
 # Theme Matt
 theme-matt:
-    just sort-app-grid
-    just set-window-controls-left-gnome
+    sort-app-grid
+    set-window-controls-left-gnome
 
 # Theme Dewy
 theme-dewy:
-    just sort-app-grid
-    just set-window-controls-right
-    just preset-dock-ubuntu
+    sort-app-grid
+    set-window-controls-right
+    preset-dock-ubuntu
 
 # Theme Fedora
 theme-fedora:
@@ -292,23 +292,23 @@ theme-normie:
 
 # Bootstrap Matt
 bootstrap-matt:
-    just install-matt
-    just theme-matt
-    just configure-matt
+    install-matt
+    theme-matt
+    configure-matt
 
 # Bootstrap Dewy
 bootstrap-dewy:
-    just install-dewy
-    just theme-dewy
-    just configure-dewy
+    install-dewy
+    theme-dewy
+    configure-dewy
 
 # Bootstrap Fedora
 bootstrap-fedora:
-    just theme-fedora
-    just configure-fedora
+    theme-fedora
+    configure-fedora
 
 # Bootstrap Normie
 bootstrap-normie:
-    just install-normie
-    just theme-normie
-    just configure-normie
+    install-normie
+    theme-normie
+    configure-normie
