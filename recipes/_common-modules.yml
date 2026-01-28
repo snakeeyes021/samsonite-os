@@ -7,7 +7,7 @@ modules:
 
   - type: gschema-overrides
     include:
-      - zz99-samsonite.gschema.override
+      - zz99-redfox.gschema.override
 
   - type: dnf
     install:

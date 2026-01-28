@@ -1,4 +1,4 @@
-# SamsoniteOS Detailed To-Do
+# RedFoxOS Detailed To-Do
 
 ## 🚨 Infrastructure Fixes
 - [x] **Migrate to DNF Module**
@@ -35,7 +35,7 @@
 - [ ] **Implement** Starship terminal prompt by default with light-theme terminal (steal from Bluefin)
 
 ## 🌳 The `ujust` Architecture Tree
-*The master plan for `files/system/usr/share/ublue-os/just/99-samsonite.just`.*
+*The master plan for `files/system/usr/share/ublue-os/just/99-redfox.just`.*
 
 ### Level 1: Atoms (Single-Purpose Scripts)
 - [ ] `configure-git`: Interactive setup (User/Email/SSH) using `gh` CLI.
@@ -109,7 +109,7 @@
 - [ ] **Wallpapers**
     - [ ] Import all Bluefin / Bluefin DX wallpapers.
     - [ ] **Collection:** Gather Pawel Czerwinski Light/Dark pairs.
-- [ ] **Samsonite Branding**
+- [ ] **RedFoxOS Branding**
     - [ ] Create/Add assets: Neofetch/Fastfetch Logo, Splash Screen, System Info Logo.
 
 ## Fixups/New (Items that arrive after a fix is already implemented)
@@ -118,6 +118,6 @@
 - [x] Confirm that Winboat is best as app-image (RPM is published on github releases page, so we could be doing this as a system package; the issue is that the appimage setup is not frictionless).
     - [x] Test appimage to confirm is working. If not, try RPM. Proceed based on findings
     - [x] Winboat requires FreeRDP
-- [ ] Change names for everything (can't use Samsonite almost certainly; probably go with RedFox)
+- [x] Change names for everything (Completed: Renamed to RedFoxOS)
 - [ ] Add sound theme change
 - [ ] Dock defaults
