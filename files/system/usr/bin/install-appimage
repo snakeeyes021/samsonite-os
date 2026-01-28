@@ -34,7 +34,7 @@ elif [ "$MANAGER" == "StaticFileUpdater" ]; then
 fi
 
 echo "   Downloading from: $DL_URL"
-TEMP_FILE="/tmp/${APP_NAME}_install.AppImage"
+TEMP_FILE=$(mktemp --suffix=.AppImage)
 curl -L -o "$TEMP_FILE" "$DL_URL"
 
 # --- 2. Integrate ---
