@@ -33,6 +33,13 @@ We have three images available, depending on your hardware:
 - **`redfox-os-nvidia`**: For modern Nvidia GPUs (GTX 16xx, RTX 20xx and newer).
 - **`redfox-os-nvidia-legacy`**: For legacy Nvidia GPUs (Pascal/GTX 10xx series and older).
 
+**Not sure which one to pick?**
+Run this command in your terminal to automatically detect your GPU and see which image is right for you:
+
+```bash
+curl -sL https://raw.githubusercontent.com/snakeeyes021/redfox-os/main/extras/identify_gpu.sh | bash
+```
+
 **Rebasing from Bluefin or Bazzite (GNOME):**
 
 To switch to RedFoxOS from an existing GNOME-based Universal Blue installation, choose the command that corresponds to your hardware:
