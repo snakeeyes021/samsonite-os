@@ -14,15 +14,21 @@ configure-cursor:
 
 # Install Zed
 install-zed:
-    echo "TODO: Implement install-zed"
+    echo "Installing Zed..."
+    curl -f https://zed.dev/install.sh | sh
+    echo "Zed installed!"
 
 # Install Gemini CLI
 install-gemini-cli:
-    echo "TODO: Implement install-gemini-cli"
+    echo "Installing Gemini CLI..."
+    brew install gemini-cli
+    echo "Gemini CLI installed!"
 
 # Install Dropbox
 install-dropbox:
-    echo "TODO: Implement install-dropbox (maestral)"
+    echo "Installing Maestral (Dropbox Client)..."
+    pip install --upgrade 'maestral[gui]'
+    echo "Maestral installed!"
 
 # Configure Heroic
 configure-heroic:
@@ -30,7 +36,7 @@ configure-heroic:
 
 # Install SoundThread
 install-soundthread:
-    echo "TODO: Implement install-soundthread"
+    /usr/bin/update-soundthread
 
 # Update all AppImages managed by Gearlever
 update-appimages:
@@ -121,7 +127,8 @@ install-daily:
         io.gitlab.news_flash.NewsFlash \
         com.github.geigi.cozy \
         com.github.johnfactotum.Foliate \
-        org.gnome.Music
+        org.gnome.Music \
+        com.spotify.Client
 
 # Install Audio Production Apps
 install-audio:
@@ -142,7 +149,8 @@ install-graphics:
         org.inkscape.Inkscape \
         org.gimp.GIMP \
         com.orama_interactive.Pixelorama \
-        nl.hjdskes.gcolor3
+        nl.hjdskes.gcolor3 \
+        net.pixieditor.PixiEditor
 
 # Install Photography Apps
 install-photos:
@@ -231,12 +239,13 @@ install-dewy:
     install-zed
     install-dropbox
     install-basic
-    install-daily
     install-productivity
     install-comms
     flatpak install -y flathub \
         org.videolan.VLC \
-        org.cvfosammmm.Setzer
+        org.cvfosammmm.Setzer \
+        net.pixieditor.PixiEditor
+        com.spotify.Client
 
 # Install Normie Bundle
 install-normie:
