@@ -126,35 +126,72 @@ classify_nvidia_by_name() {
   echo "redfox-os-nvidia"
 }
 
+print_recommendation() {
+  local image="$1"
+  local reason="$2"
+  local category="Intel/AMD"
+
+  if [[ "$image" == "redfox-os-nvidia" ]]; then
+    category="Nvidia Modern"
+  elif [[ "$image" == "redfox-os-nvidia-legacy" ]]; then
+    category="Nvidia Legacy"
+  fi
+
+  local GREEN=""
+  local BOLD=""
+  local RESET=""
+
+  # Check if stdout is a terminal
+  if [ -t 1 ]; then
+    GREEN="\033[1;32m"
+    BOLD="\033[1m"
+    RESET="\033[0m"
+  fi
+
+  echo -e "${reason}. Recommended image: ${GREEN}${image}${RESET} ${BOLD}(${category})${RESET}"
+}
+
 main() {
-  local lines preferred
+  local lines preferred image reason
 
   lines="$(gpu_lines)"
   if [[ -z "${lines:-}" ]]; then
-    # Minimal system without pciutils: default to non-nvidia image
-    echo "redfox-os"
+    print_recommendation "redfox-os" "No GPU detected"
     exit 0
   fi
 
   preferred="$(pick_preferred "$lines")"
 
   if echo "$preferred" | grep -qi 'nvidia'; then
-    if out="$(classify_nvidia_by_cc)"; then
-      echo "$out"
+    if image="$(classify_nvidia_by_cc)"; then
+      if [[ "$image" == "redfox-os-nvidia-legacy" ]]; then
+        reason="Nvidia GPU detected (Legacy Compute Capability)"
+      else
+        reason="Nvidia GPU detected (Modern Compute Capability)"
+      fi
+      print_recommendation "$image" "$reason"
       exit 0
     fi
-    echo "$(classify_nvidia_by_name "$preferred")"
+    
+    image="$(classify_nvidia_by_name "$preferred")"
+    if [[ "$image" == "redfox-os-nvidia-legacy" ]]; then
+        reason="Nvidia GPU detected (Legacy Model Name)"
+    else
+        reason="Nvidia GPU detected (Modern Model Name)"
+    fi
+    print_recommendation "$image" "$reason"
     exit 0
   fi
 
   # Intel/AMD => base image
   if echo "$preferred" | grep -qiE 'intel|amd|advanced micro devices|ati'; then
-    echo "redfox-os"
+    print_recommendation "redfox-os" "Intel/AMD GPU detected"
     exit 0
   fi
 
   # Unknown vendor => base image
-  echo "redfox-os"
+  print_recommendation "redfox-os" "No Nvidia hardware detected"
+  exit 0
 }
 
 main "$@"
