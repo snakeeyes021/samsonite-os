@@ -8,6 +8,8 @@ REPO_URL="$3"
 FILE_PATTERN="$4"
 PRERELEASE="${5:-false}"
 
+echo -e "Note: This installer downloads unverified software directly from the developer's public repo. \033[1;31mEnsure you trust the source and the author before running.\033[0m"
+
 echo "=== Handling AppImage: $APP_NAME ==="
 
 # --- 1. Download ---

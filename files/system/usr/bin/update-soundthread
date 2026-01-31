@@ -1,0 +1,119 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+APP_NAME="SoundThread"
+INSTALL_DIR="$HOME/.local/share/$APP_NAME"
+DESKTOP_FILE="$HOME/.local/share/applications/$APP_NAME.desktop"
+REPO="j-p-higgins/SoundThread"
+
+# Godot App UserData path
+CONFIG_DIR="$HOME/.local/share/godot/app_userdata/$APP_NAME"
+CONFIG_FILE="$CONFIG_DIR/settings.ini"
+
+echo -e "Note: This installer downloads unverified software directly from the developer's public repo (GitHub). \033[1;31mEnsure you trust the source and the author before running.\033[0m"
+
+if [ -d "$INSTALL_DIR" ]; then
+    ACTION_MSG="Checking for updates for"
+    SUCCESS_MSG="updated"
+else
+    ACTION_MSG="Installing"
+    SUCCESS_MSG="installed"
+fi
+
+echo "$ACTION_MSG $APP_NAME..."
+
+# Get the latest release data from GitHub API
+LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest")
+TAG_NAME=$(echo "$LATEST_RELEASE" | jq -r '.tag_name')
+
+if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" == "null" ]; then
+    echo "Error: Could not fetch latest release version."
+    exit 1
+fi
+
+echo "Latest version: $TAG_NAME"
+
+# Construct download URL (assuming standard naming convention based on user input)
+# Pattern: SoundThread_v1.0.1-beta_linux_x86_64.tar.gz
+# We need to construct the filename dynamically or parse the assets.
+# Parsing assets is safer.
+
+DOWNLOAD_URL=$(echo "$LATEST_RELEASE" | jq -r '.assets[] | select(.name | endswith("linux_x86_64.tar.gz")) | .browser_download_url')
+
+if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" == "null" ]; then
+    echo "Error: Could not find a compatible linux_x86_64 download asset."
+    exit 1
+fi
+
+echo "Downloading from: $DOWNLOAD_URL"
+
+# Create temp dir
+TEMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TEMP_DIR"' EXIT
+
+# Download
+curl -L -o "$TEMP_DIR/soundthread.tar.gz" "$DOWNLOAD_URL"
+
+# Prepare Install Dir
+mkdir -p "$INSTALL_DIR"
+
+# Extract
+# The archive usually contains a folder, strip it.
+tar -xzf "$TEMP_DIR/soundthread.tar.gz" -C "$INSTALL_DIR" --strip-components=1
+
+# Extract CDP binaries
+echo "Extracting CDP binaries..."
+tar -xzf "$INSTALL_DIR/cdprogs_linux.tar.gz" -C "$INSTALL_DIR"
+
+# Configure CDP Location
+echo "Configuring CDP location..."
+mkdir -p "$CONFIG_DIR"
+CDP_PATH="$INSTALL_DIR/cdprogs_linux"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    # Create new config file
+    cat > "$CONFIG_FILE" <<EOF
+[cdpprogs]
+
+location="$CDP_PATH"
+EOF
+else
+    # Update existing config
+    # We use a temporary file to safely update the location
+    if grep -q "\[cdpprogs\]" "$CONFIG_FILE"; then
+        # Section exists, update location
+        sed -i "s#location=\".*\"#location=\"$CDP_PATH\"#" "$CONFIG_FILE"
+    else
+        # Section missing, append it
+        cat >> "$CONFIG_FILE" <<EOF
+
+[cdpprogs]
+
+location="$CDP_PATH"
+EOF
+    fi
+fi
+
+# Download Icon
+echo "Downloading icon..."
+curl -L -o "$INSTALL_DIR/SoundThread.png" "https://raw.githubusercontent.com/j-p-higgins/SoundThread/main/theme/images/icon.png"
+
+# Create Desktop Entry
+echo "Creating desktop entry..."
+mkdir -p "$(dirname "$DESKTOP_FILE")"
+
+cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Name=SoundThread
+Comment=GUI for CDP
+Exec=$INSTALL_DIR/SoundThread.x86_64
+Icon=$INSTALL_DIR/SoundThread.png
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;
+EOF
+
+# Make executable just in case
+chmod +x "$INSTALL_DIR/SoundThread.x86_64"
+
+echo "$APP_NAME $SUCCESS_MSG to $TAG_NAME successfully."

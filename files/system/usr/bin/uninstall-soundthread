@@ -1,0 +1,38 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+APP_NAME="SoundThread"
+INSTALL_DIR="$HOME/.local/share/$APP_NAME"
+DESKTOP_FILE="$HOME/.local/share/applications/$APP_NAME.desktop"
+CONFIG_DIR="$HOME/.local/share/godot/app_userdata/$APP_NAME"
+
+echo "Uninstalling $APP_NAME..."
+
+# Remove App Directory
+if [ -d "$INSTALL_DIR" ]; then
+    rm -rf "$INSTALL_DIR"
+    echo "Removed application directory: $INSTALL_DIR"
+else
+    echo "Application directory not found: $INSTALL_DIR"
+fi
+
+# Remove Desktop File
+if [ -f "$DESKTOP_FILE" ]; then
+    rm -f "$DESKTOP_FILE"
+    echo "Removed desktop file: $DESKTOP_FILE"
+else
+    echo "Desktop file not found: $DESKTOP_FILE"
+fi
+
+# Remove Configuration
+if [ -d "$CONFIG_DIR" ]; then
+    rm -rf "$CONFIG_DIR"
+    echo "Removed configuration directory: $CONFIG_DIR"
+else
+    echo "Configuration directory not found: $CONFIG_DIR"
+fi
+
+# Update desktop database to reflect removal
+update-desktop-database "$HOME/.local/share/applications" || true
+
+echo "$APP_NAME uninstalled successfully."

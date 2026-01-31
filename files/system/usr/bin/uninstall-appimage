@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage: uninstall-appimage <APP_NAME>
+
+APP_NAME="$1"
+
+if [ -z "$APP_NAME" ]; then
+    echo "Usage: uninstall-appimage <APP_NAME>"
+    exit 1
+fi
+
+echo "Searching for AppImage: $APP_NAME..."
+
+# Gearlever list format is typically: "AppName (ID) [Version] [Status] /path/to/file.AppImage"
+# 1. Use grep -iw to match the whole word (avoids "Boat" matching "WinBoat").
+# 2. Use grep -o "/.*" to extract the absolute path (handles spaces in path).
+# 3. Use sed to strip trailing whitespace.
+INSTALLED_PATH=$(flatpak run it.mijorus.gearlever --list-installed | grep -iw "$APP_NAME" | head -n 1 | grep -o "/.*" | sed 's/[[:space:]]*$//')
+
+if [ -z "$INSTALLED_PATH" ]; then
+    echo "Error: AppImage for '$APP_NAME' not found in Gearlever database."
+    exit 1
+fi
+
+echo "Found: $INSTALLED_PATH"
+echo "Removing using Gearlever..."
+
+flatpak run it.mijorus.gearlever --remove "$INSTALLED_PATH"
+
+echo "$APP_NAME uninstalled successfully."
