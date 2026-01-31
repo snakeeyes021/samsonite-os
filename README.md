@@ -12,16 +12,15 @@ Its primary raison d'être is to provide driver support for Pascal-series Nvidia
 - [x] **Virtualization:** Libvirt/QEMU, Cockpit (Machines, Podman, Bridge)
 - [x] **Development:** VS Code (System install), Android Tools, BPF Tools (bpftop, bpftrace), Sysprof
 - [x] **CLI Utilities:** zsh, restic, rclone, ccache, ramalama (Local AI)
-- [ ] **Editor:** Zed (System install)
-- [ ] **Additional AI Utilities:** Cursor, Gemini CLI
-- [ ] **Unified Virtualization:** System-level GNOME Boxes + Virt-Manager integration.
+- [x] **Editor:** Zed (ujust recipe installer)
+- [x] **Additional AI Utilities:** Cursor (system), Gemini CLI (ujust)
+- [x] **Unified Virtualization:** System-level GNOME Boxes + Virt-Manager integration
 
 ### Desktop & Media
-- [x] **NVIDIA Pascal Support:** Built on `bazzite-gnome-nvidia` for legacy driver support.
-- [x] **Creative Suite:** Blender, GIMP, Kdenlive, OBS Studio (Pre-installed Flatpaks).
-- [ ] **Audio Production:** A curated collection of music/audio tools.
-- [ ] **Shell Customization:** Starship prompt integration.
-- [ ] **GNOME Tweaks:** Further "vanilla" GNOME configuration.
+- [x] **NVIDIA Pascal Support:** Built on `bazzite-gnome-nvidia` for legacy driver support
+- [x] **Curated App Packs:** Creative, Productivity, Dev, and several other curated app bundle installers, all installable via simple ujust recipes
+- [ ] **Shell Customization:** Starship prompt integration
+- [ ] **GNOME config:** Several preset desktop environment configs, including a mostly "vanilla" GNOME config, all available via simple ujust recipes
 - [ ] **More:** Wallpaper, keyboard shortcuts, etc.
 
 ## Installation
