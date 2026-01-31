@@ -10,6 +10,8 @@ REPO="j-p-higgins/SoundThread"
 CONFIG_DIR="$HOME/.local/share/godot/app_userdata/$APP_NAME"
 CONFIG_FILE="$CONFIG_DIR/settings.ini"
 
+echo -e "Note: This installer downloads unverified software directly from the developer's public repo (GitHub). \033[1;31mEnsure you trust the source and the author before running.\033[0m"
+
 if [ -d "$INSTALL_DIR" ]; then
     ACTION_MSG="Checking for updates for"
     SUCCESS_MSG="updated"
