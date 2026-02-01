@@ -28,14 +28,25 @@
     - [ ] **Behavior:** Isolate Workspaces (`true`).
     - [ ] **Click Action:** `minimize-or-previews` (Focus, minimize, or show previews).
     - [ ] **Size:** Fixed icon size (Scroll to reveal).
+    - [ ] **Size:** Icon size limit (40px).
+    - [ ] **Appearance:** Shrink the dash (remove edge-to-edge).
+- [ ] **App Grid Defaults**
+    - [ ] **Behavior:** Sort alphabetically (no folders).
+    - [ ] **Behavior:** Pinning to dock must not remove from grid.
 
 ## 📦 Default Software
 - [x] **Winboat:** Determine installation (DNF/Flatpak) and add to system defaults.
+- [ ] **Dropbox:** Install official Dropbox client (System/DNF/RPM).
 - [x] **Implement** System-level GNOME Boxes + Virt-Manager
 - [ ] **Implement** Starship terminal prompt by default with light-theme terminal (steal from Bluefin)
+    - [ ] **Implement** ujust "configure" recipes for starship bluefin (system default, "reset"), starship bazzite (deviation), starship off (deviation)
 
 ## 🌳 The `ujust` Architecture Tree
 *The master plan for `files/system/usr/share/ublue-os/just/99-redfox.just`.*
+
+> **Architecture Note: Deviations vs. Resets**
+> *   **Deviation Recipes** (e.g., `set-window-controls-right`) use `gsettings set` to apply specific user preferences.
+> *   **Reset/Default Recipes** (e.g., `set-window-controls-left-gnome`) use `gsettings reset` to clear user overrides and revert to the system-wide baseline defined in `gschema-overrides`.
 
 ### Level 1: Atoms (Single-Purpose Scripts)
 - [ ] `configure-git`: Interactive setup (User/Email/SSH) using `gh` CLI.
@@ -51,15 +62,25 @@
         - `sudo flatpak override --filesystem=xdg-data/themes`
         - `sudo flatpak mask org.gtk.Gtk3theme.adw-gtk3`
         - `sudo flatpak mask org.gtk.Gtk3theme.adw-gtk3-dark`
+    - [ ] `configure-tiling-dewy` (Deviation):
+        - [ ] Show Indicator = true, Gaps (Inner/Outer) = 0.
+        - [ ] Enable Snap Assistant = false.
+        - [ ] **Keybindings:** Move (Super+Arrow), Cycle (Ctrl+Right Arrow), Focus (Remove Super+Arrow).
+    - [ ] `configure-tiling-default` (Reset): Revert Tiling Shell extension to system defaults.
+    - [ ] `configure-text-editor-dev` (Deviation):
+        - [ ] Indentation: Spaces, 4 per tab/indent.
+    - [ ] `configure-text-editor-dewy-visuals` (Deviation):
+        - [ ] Dark Mode, Line Numbers, Overview Map, Highlight Current Line.
+    - [ ] `configure-text-editor-reset` (Reset): Revert indentation and visuals to system defaults.
     - [ ] figure out terminal recipes (starship/no starship, light theme/system theme, etc)
-    - [ ] `set-window-controls-right`: Sets `:minimize,maximize,close`.
-    - [ ] `set-window-controls-left-gnome`: Sets `close:`. (this is the default, but it needs to exist if someone runs the above and wants to return to default without nuking their whole dconf file)
-    - [ ] `sort-app-grid`: Removes folders and sorts alphabetically.
-    - [ ] `default-app-grid`: Restores folders and sorts with default sorting. (this is the default, but like the above, it needs to exist)
-    - [ ] `preset-dock-ubuntu`: Configure Dash to Dock (Left side). Turn on Dash to Dock.
-    - [ ] `preset-dock-win-classic`: Configure Dash to Dock (Bottom, Taskbar style, icons on left). Turn on Dash to Dock.
-    - [ ] `preset-dock-win-new`: Configure Dash to Dock (Bottom, Taskbar style, icons on centered). Turn on Dash to Dock.
-    - [ ] `preset-dock-macos`: Configure Dash to Dock (Bottom, Floating). Turn on Dash to Dock.
+    - [ ] `set-window-controls-right` (Deviation): Sets `:minimize,maximize,close`.
+    - [ ] `set-window-controls-left-gnome` (Reset): Sets `close:` (reverts to system default).
+    - [ ] `sort-app-grid` (Deviation): Removes folders and sorts alphabetically.
+    - [ ] `default-app-grid` (Reset): Restores folders and sorts with default sorting.
+    - [ ] `preset-dock-ubuntu` (Reset): Configure Dash to Dock (Left side). Turn on Dash to Dock.
+    - [ ] `preset-dock-win-classic` (Deviation): Configure Dash to Dock (Bottom, Taskbar style, icons on left). Turn on Dash to Dock.
+    - [ ] `preset-dock-win-new` (Deviation): Configure Dash to Dock (Bottom, Taskbar style, icons on centered). Turn on Dash to Dock.
+    - [ ] `preset-dock-macos` (Deviation): Configure Dash to Dock (Bottom, Floating). Turn on Dash to Dock.
 - [ ] **Hardware Atoms (Must include Host Checks):**
     - [ ] `fix-oryp9-mouse`: Udev rule (Run only if Oryp9).
     - [ ] `fix-acer-nouveau`: Kernel args (Run only if Acer).
@@ -119,6 +140,7 @@
     - [x] Test appimage to confirm is working. If not, try RPM. Proceed based on findings
     - [x] Winboat requires FreeRDP
 - [x] Change names for everything (Completed: Renamed to RedFoxOS)
-- [ ] Add sound theme change
+- [ ] Add sound theme change -- ujust (set default sound theme to normal fedora default, "reset". set sound to bazzite, "deviation")
 - [ ] Dock defaults
 - [ ] Set default hostname, etc
+- [ ] Determine 
